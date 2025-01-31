@@ -13,11 +13,15 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
+      - ./mosquitto/scripts/entrypoint.sh:/entrypoint.sh
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/storage:/mosquitto/data
       - ./mosquitto/logs:/mosquitto/log
 
-    command: /bin/bash -c "mosquitto_passwd -c /mosquitto/config/passwordfile usuario && /docker-entrypoint.sh mosquitto"
+    entrypoint: ['/entrypoint.sh']
+
+    networks:
+      - router4me-revproxy-net
 
     labels:
       - 'traefik.enable=true'
