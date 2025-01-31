@@ -1,2 +1,4 @@
 **/storage/
-**/logs
+**/logs/
+
+**/.env
