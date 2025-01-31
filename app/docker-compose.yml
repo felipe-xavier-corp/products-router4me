@@ -13,6 +13,8 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
+      - ./assets:/usr/src/router4me-app/assets
+
     env_file:
       - .env
 

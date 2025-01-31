@@ -1,4 +1,6 @@
 **/storage/
 **/logs/
 
+app/assets/
+
 **/.env
