@@ -21,11 +21,8 @@ services:
 
     entrypoint: ['/entrypoint.sh']
 
-    #networks:
-    #  - router4me-revproxy-net
-
-    ports:
-      - 1883:1883
+    networks:
+      - router4me-revproxy-net
 
     labels:
       - 'traefik.enable=true'
