@@ -1,0 +1,31 @@
+networks:
+  router4me-revproxy-net:
+    external: true
+
+services:
+  webchat:
+    image: eclipse-mosquitto:2.0.20
+    container_name: router4me-webchat
+
+    restart: always
+
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/storage:/mosquitto/data
+      - ./mosquitto/logs:/mosquitto/log
+
+    command: /bin/bash -c "mosquitto_passwd -c /mosquitto/config/passwordfile usuario && /docker-entrypoint.sh mosquitto"
+
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.router4me-webchat.entrypoints=http'
+      - 'traefik.http.routers.router4me-webchat.priority=2'
+      - 'traefik.http.routers.router4me-webchat.rule=Host(`${DOMAIN}`) && PathPrefix(`/webchat{regex:$$|/.*}`)'
+
+      - 'traefik.http.routers.router4me-webchat.middlewares=router4me-webchat-stripprefix'
+      - 'traefik.http.middlewares.router4me-webchat-stripprefix.stripprefix.prefixes=/webchat'
+
+      - 'traefik.http.services.router4me-webchat.loadbalancer.server.port=1883'
