@@ -1,0 +1,81 @@
+################################################################
+#
+# Configuration sample for Traefik v2.
+#
+# For Traefik v1: https://github.com/traefik/traefik/blob/v1.7/traefik.sample.toml
+#
+################################################################
+
+################################################################
+# EntryPoints configuration
+################################################################
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+
+################################################################
+# Traefik logs configuration
+################################################################
+
+#log:
+#  level: DEBUG
+#  format: json
+#  filePath: /log/traefik/traefik.log
+
+################################################################
+# Access logs configuration
+################################################################
+
+# Enable access logs
+# By default it will write to stdout and produce logs in the textual
+# Common Log Format (CLF), extended with additional fields.
+#
+# Optional
+#
+#accessLog:
+#  format: json
+#  filePath: /log/traefik/access/access.txt
+# Sets the file path for the access log. If not specified, stdout will be used.
+# Intermediate directories are created if necessary.
+#
+# Optional
+# Default: os.Stdout
+#
+
+# Format is either "json" or "common".
+#
+# Optional
+# Default: "common"
+#
+#
+
+################################################################
+# API and dashboard configuration
+################################################################
+
+api:
+  dashboard: true
+  insecure: true
+
+#metrics:
+#  prometheus: {}
+
+################################################################
+# Docker configuration backend
+################################################################
+
+providers:
+  docker:
+    watch: true
+    network: "router4me-revproxy-net"
+    exposedByDefault: false
+    #defaultRule: "Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
+#certificatesResolvers:
+#  le:
+#    acme:
+#      tlschallenge: true
+#      storage: acme.json
+#      email: devops@solve4me.com

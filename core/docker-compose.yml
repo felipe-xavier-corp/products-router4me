@@ -1,0 +1,48 @@
+networks:
+  router4me-db-net:
+    external: true
+  router4me-revproxy-net:
+    external: true
+  router4me-monitor-net:
+    external: true
+
+services:
+  router4me:
+    image: ghcr.io/solve4me/products-router4me-core:v1.0.0
+    container_name: router4me-${COREID}
+
+    restart: always
+
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+      - ./logs/${COREID}:/var/log/router4me
+
+    env_file:
+      - .env
+      - ${COREID}.env
+
+    environment:
+      - DATABASE_URI=mongodb://router4me-db:27017/router4me-${COREID}
+
+      - PUSH_GATEWAY_URL=http://router4me-pushgateway:9091
+      - PUSH_GATEWAY_INTERVAL=30000
+
+      - REDIS_URL=redis://router4me-redis:6379
+
+    networks:
+      - router4me-db-net
+      - router4me-revproxy-net
+      - router4me-monitor-net
+
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.router4me-${COREID}.entrypoints=http'
+      - 'traefik.http.routers.router4me-${COREID}.priority=2'
+      - 'traefik.http.routers.router4me-${COREID}.rule=Host(`${DOMAIN}`) && PathPrefix(`/core/${COREID}/api{regex:$$|/.*}`)'
+
+      - 'traefik.http.routers.router4me-${COREID}.middlewares=router4me-${COREID}-stripprefix'
+      - 'traefik.http.middlewares.router4me-${COREID}-stripprefix.stripprefix.prefixes=/core/${COREID}/api'
+
+      - 'traefik.http.services.router4me-${COREID}.loadbalancer.server.port=3030'

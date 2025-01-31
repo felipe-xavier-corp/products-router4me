@@ -1,0 +1,46 @@
+networks:
+  revproxy-net:
+    name: router4me-revproxy-net
+
+services:
+  revproxy:
+    image: traefik:v2.8
+    container_name: router4me-revproxy
+
+    restart: always
+
+    ports:
+      - 80:80
+      - 443:443
+    #  - 8080:8080
+
+    networks:
+      - revproxy-net
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      #- ./logs:/log/traefik
+
+      - ./data/traefik.yml:/etc/traefik/traefik.yml
+      #- ./data/acme/:/var/acme.json
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=(PathPrefix(`/app/revproxy`) || PathPrefix(`/api`))"
+      #- "traefik.http.routers.traefik.rule=Host(`${DOMAIN}`) && (PathPrefix(`/app/revproxy`) || PathPrefix(`/api`))"
+      #- "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=traefik-strip,traefik-auth"
+
+      #- "traefik.http.routers.traefik.tls=true"
+      #- "traefik.http.routers.traefik.tls.certresolver=le"
+
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=tr43f1k_u53r:$$2a$$12$$0zlG.2SoArY7EXn1jm2Z0u83VX.0otyB.pPc.xmCix8KPinU04cr2" #ATRp44b8ZEyJ1GMUymz5cBechRoY0t
+
+      - "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/app/revproxy"
+
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"

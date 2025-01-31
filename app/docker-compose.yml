@@ -1,0 +1,28 @@
+networks:
+  router4me-revproxy-net:
+    external: true
+
+services:
+  app:
+    image: ghcr.io/solve4me/products-router4me-app:v1.0.0
+    container_name: router4me-app
+
+    restart: always
+
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    env_file:
+      - .env
+
+    networks:
+      - router4me-revproxy-net
+
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.router4me-app.entrypoints=http'
+      - 'traefik.http.routers.router4me-app.priority=1'
+      - 'traefik.http.routers.router4me-app.rule=Host(`${DOMAIN}`) && PathPrefix(`/`)'
+
+      - 'traefik.http.services.router4me-app.loadbalancer.server.port=3030'

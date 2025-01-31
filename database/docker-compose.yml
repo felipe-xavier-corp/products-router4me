@@ -1,0 +1,32 @@
+networks:
+  router4me-db-net:
+    name: router4me-db-net
+
+services:
+  db:
+    image: mongo:6.0
+    container_name: router4me-db
+
+    restart: always
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+      - ./storage:/data/db
+
+    networks:
+      - router4me-db-net
+
+  redis:
+    image: redis:alpine3.17
+    container_name: router4me-redis
+
+    restart: always
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+    networks:
+      - router4me-db-net

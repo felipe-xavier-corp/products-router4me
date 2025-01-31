@@ -1,0 +1,85 @@
+networks:
+  router4me-monitor-net:
+    name: router4me-monitor-net
+  router4me-revproxy-net:
+    external: true
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: router4me-prometheus
+
+    restart: always
+    user: root
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+      - ./prometheus/storage:/prometheus
+      - ./prometheus/config:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+    networks:
+      - router4me-monitor-net
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: router4me-pushgateway
+
+    depends_on:
+      - prometheus
+
+    restart: always
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+    command:
+      #- '--web.listen-address=:9191'
+      - '--push.disable-consistency-check'
+      - '--persistence.interval=5m'
+
+    networks:
+      - router4me-monitor-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: router4me-grafana
+
+    restart: unless-stopped
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+      - ./grafana/storage:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+
+    environment:
+      - GF_SERVER_DOMAIN=${DOMAIN}
+      - GF_SERVER_ROOT_URL=https://${DOMAIN}/monitor
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_SECURITY_ADMIN_PASSWORD}
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_USERS_DEFAULT_THEME=light
+      - GF_USERS_DEFAULT_LANGUAGE=pt_BR
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+    networks:
+      - router4me-monitor-net
+      - router4me-revproxy-net
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.router4me-monitor.entrypoints=http'
+      - 'traefik.http.routers.router4me-monitor.priority=2'
+      - 'traefik.http.routers.router4me-monitor.rule=Host(`${DOMAIN}`) && PathPrefix(`/monitor{regex:$$|/.*}`)'
+
+      - 'traefik.http.routers.router4me-monitor.middlewares=router4me-monitor-stripprefix'
+      - 'traefik.http.middlewares.router4me-monitor-stripprefix.stripprefix.prefixes=/monitor'
+
+      - 'traefik.http.services.router4me-monitor.loadbalancer.server.port=3000'
