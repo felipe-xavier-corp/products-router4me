@@ -6,7 +6,7 @@ networks:
 
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.1.0
     container_name: router4me-prometheus
 
     restart: always
@@ -26,7 +26,7 @@ services:
       - router4me-monitor-net
 
   pushgateway:
-    image: prom/pushgateway
+    image: prom/pushgateway:v1.11.0
     container_name: router4me-pushgateway
 
     depends_on:
@@ -47,7 +47,7 @@ services:
       - router4me-monitor-net
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:11.4.1
     container_name: router4me-grafana
 
     restart: unless-stopped
