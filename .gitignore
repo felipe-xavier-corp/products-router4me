@@ -3,4 +3,5 @@
 
 **/.env
 
-webchat/mosquitto/config/passwordfile
+webchat/mosquitto/config/mosquitto_acls
+webchat/mosquitto/config/passwd

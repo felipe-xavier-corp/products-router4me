@@ -1,5 +1,0 @@
-user router4me_server
-topic readwrite 
-
-user router4me_client
-topic read

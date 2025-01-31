@@ -4,7 +4,7 @@ networks:
 
 services:
   webchat:
-    image: eclipse-mosquitto:2.0.20
+    image: eclipse-mosquitto:2
     container_name: router4me-webchat
 
     restart: always
@@ -14,14 +14,18 @@ services:
       - /etc/localtime:/etc/localtime:ro
 
       - ./mosquitto/scripts/entrypoint.sh:/entrypoint.sh
+
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/storage:/mosquitto/data
       - ./mosquitto/logs:/mosquitto/log
 
     entrypoint: ['/entrypoint.sh']
 
-    networks:
-      - router4me-revproxy-net
+    #networks:
+    #  - router4me-revproxy-net
+
+    ports:
+      - 1883:1883
 
     labels:
       - 'traefik.enable=true'
