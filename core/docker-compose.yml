@@ -26,10 +26,13 @@ services:
     environment:
       - DATABASE_URI=mongodb://router4me-db:27017/router4me-${COREID}
 
+      - REDIS_URL=redis://router4me-redis:6379
+
       - PUSH_GATEWAY_URL=http://router4me-pushgateway:9091
       - PUSH_GATEWAY_INTERVAL=30000
 
-      - REDIS_URL=redis://router4me-redis:6379
+      - NATIVE_WEBCHAT_URL=ws://router4me-webchat
+      - NATIVE_WEBCHAT_USER=router4me_server
 
     networks:
       - router4me-db-net
