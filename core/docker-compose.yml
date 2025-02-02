@@ -31,7 +31,7 @@ services:
       - PUSH_GATEWAY_URL=http://router4me-pushgateway:9091
       - PUSH_GATEWAY_INTERVAL=30000
 
-      - NATIVE_WEBCHAT_URL=ws://router4me-webchat
+      - NATIVE_WEBCHAT_URL=ws://router4me-webchat:1883
       - NATIVE_WEBCHAT_USER=router4me_server
 
     networks:
