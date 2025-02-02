@@ -4,10 +4,10 @@ PASSWORD_FILE="/mosquitto/config/passwd"
 
 if [ ! -f "$ACLS_FILE" ]; then
   echo "user router4me_server" > $ACLS_FILE
-  echo "topic readwrite" >> $ACLS_FILE
+  echo "topic write #" >> $ACLS_FILE
 
   echo "user router4me_client" >> $ACLS_FILE
-  echo "topic read" >> $ACLS_FILE
+  echo "topic read #" >> $ACLS_FILE
 
   chmod 0700 $ACLS_FILE
 fi
